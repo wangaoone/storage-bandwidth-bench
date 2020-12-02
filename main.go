@@ -42,7 +42,7 @@ func perform(duration time.Duration, thread int, s3 *client.S3) {
 					fmt.Printf("idx %v set err is %v\n", currentIdx, err)
 				}
 				duration := time.Since(start)
-				log.Printf("%v,%v,%v", key, SIZE, duration)
+				log.Printf("%v,%v,%v", key, SIZE, duration.Seconds())
 			}
 		}
 	}()
@@ -74,5 +74,5 @@ func main() {
 	start := time.Now()
 	perform(BenchDuration, 1, s3Client)
 	duration := time.Since(start)
-	log.Printf("Total latency is %v\n", duration)
+	log.Printf("Total latency is %v\n", duration.Seconds())
 }
