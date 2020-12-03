@@ -12,16 +12,13 @@ import (
 	"time"
 )
 
-const (
-	SIZE          = 1024 * 1024 * 10
-	BenchDuration = 60 * time.Second
-)
-
 var (
-	keyIdx     = flag.Int64("keyIdx", 0, "key start index")
-	fileName   = flag.String("o", "tempFile", "output file name")
-	bucketName = flag.String("bucket", "bandwidth.ao.test", "bucket name")
-	thread     = flag.Int("thread", 1, "number of concurrent thread")
+	keyIdx        = flag.Int64("keyIdx", 0, "key start index")
+	fileName      = flag.String("o", "tempFile", "output file name")
+	bucketName    = flag.String("bucket", "bandwidth.ao.test", "bucket name")
+	thread        = flag.Int("thread", 1, "number of concurrent thread")
+	size          = flag.Int("size", 10485760, "object size")
+	benchDuration = flag.Int("duration", 60, "duration in second")
 )
 
 func perform(duration time.Duration, threadIdx int, s3 *client.S3, wg *sync.WaitGroup) {
@@ -37,7 +34,7 @@ func perform(duration time.Duration, threadIdx int, s3 *client.S3, wg *sync.Wait
 			default:
 				currentIdx := atomic.AddInt64(keyIdx, 1)
 				key := generateKey(currentIdx, threadIdx)
-				val := make([]byte, SIZE)
+				val := make([]byte, *size)
 				rand.Read(val)
 				fmt.Printf("thread is %v, key is %v\n", threadIdx, key)
 				start := time.Now()
@@ -46,7 +43,7 @@ func perform(duration time.Duration, threadIdx int, s3 *client.S3, wg *sync.Wait
 					fmt.Printf("idx %v set err is %v\n", currentIdx, err)
 				}
 				duration := time.Since(start)
-				log.Printf("%v,%v,%v", key, SIZE, duration.Seconds())
+				log.Printf("%v,%v,%v", key, *size, duration.Seconds())
 			}
 		}
 	}()
@@ -66,6 +63,7 @@ func generateKey(idx int64, threadIdx int) string {
 
 func main() {
 	flag.Parse()
+	benchDura := time.Duration(*benchDuration) * time.Second
 
 	f, err := os.OpenFile(*fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
@@ -81,7 +79,7 @@ func main() {
 	start := time.Now()
 	for i := 0; i < *thread; i++ {
 		wg.Add(1)
-		go perform(BenchDuration, i, s3Client, &wg)
+		go perform(benchDura, i, s3Client, &wg)
 	}
 	wg.Wait()
 	duration := time.Since(start)
