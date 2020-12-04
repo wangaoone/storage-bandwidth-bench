@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/google/uuid"
 	"log"
 	"math/rand"
 	"os"
@@ -12,16 +13,24 @@ import (
 	"time"
 )
 
+type Client interface {
+	Get(string) ([]byte, error)
+	Set(string, []byte) error
+}
+
 var (
-	keyIdx        = flag.Int64("keyIdx", 0, "key start index")
 	fileName      = flag.String("o", "tempFile", "output file name")
 	bucketName    = flag.String("bucket", "bandwidth.ao.test", "bucket name")
 	thread        = flag.Int("thread", 1, "number of concurrent thread")
 	size          = flag.Int("size", 10485760, "object size")
 	benchDuration = flag.Int("duration", 60, "duration in second")
+	storage       = flag.String("storage", "foo", "storage type [s3, redis]")
+	redisAddr     = flag.String("redis endpoint", "foo", "redis endpoint")
+
+	count int64
 )
 
-func perform(duration time.Duration, threadIdx int, s3 *client.S3, wg *sync.WaitGroup) {
+func perform(duration time.Duration, threadIdx int, client Client, val []byte, wg *sync.WaitGroup) {
 	t := time.NewTicker(duration)
 	defer wg.Done()
 	defer t.Stop()
@@ -32,24 +41,22 @@ func perform(duration time.Duration, threadIdx int, s3 *client.S3, wg *sync.Wait
 			case <-quitC:
 				return
 			default:
-				currentIdx := atomic.AddInt64(keyIdx, 1)
-				key := generateKey(currentIdx, threadIdx)
-				val := make([]byte, *size)
-				rand.Read(val)
-				fmt.Printf("thread is %v, key is %v\n", threadIdx, key)
+				key := uuid.New().String()
 				start := time.Now()
-				err := s3.Set(key, val)
+				err := client.Set(key, val)
 				if err != nil {
-					fmt.Printf("idx %v set err is %v\n", currentIdx, err)
+					fmt.Printf("key %vset err is %v\n", key, err)
 				}
 				duration := time.Since(start)
-				log.Printf("%v,%v,%v", key, *size, duration.Seconds())
+				atomic.AddInt64(&count, 1)
+				fmt.Printf("Set finished, thread is %v, key is %v\n", threadIdx, key)
+				log.Printf("%v,%v,%v", key, len(val), duration.Seconds())
 			}
 		}
 	}()
 	select {
 	case <-t.C:
-		log.Println("Timeout, going to return")
+		fmt.Println("Timeout, going to return")
 		quitC <- true
 		return
 	}
@@ -63,25 +70,37 @@ func generateKey(idx int64, threadIdx int) string {
 
 func main() {
 	flag.Parse()
-	benchDura := time.Duration(*benchDuration) * time.Second
 
+	var wg sync.WaitGroup
+	var c Client
+
+	benchDura := time.Duration(*benchDuration) * time.Second
 	f, err := os.OpenFile(*fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
-	//set output of logs to f
+	//set output of logs to file
 	log.SetOutput(f)
 	defer f.Close()
 
+	if *storage == "s3" {
+		c = client.NewS3Client(*bucketName)
+	} else if *storage == "redis" {
+		c = client.NewRedisClient(*redisAddr)
+	}
+
+	// generate load
+	val := make([]byte, *size)
+	rand.Read(val)
+
 	log.Printf("key, size, duration\n")
-	s3Client := client.NewS3Client(*bucketName)
-	var wg sync.WaitGroup
 	start := time.Now()
 	for i := 0; i < *thread; i++ {
 		wg.Add(1)
-		go perform(benchDura, i, s3Client, &wg)
+		go perform(benchDura, i, c, val, &wg)
 	}
 	wg.Wait()
 	duration := time.Since(start)
-	log.Printf("Total latency is %v\n", duration.Seconds())
+	fmt.Printf("Total latency is %v\n", duration.Seconds())
+	log.Println("Total obj count ", atomic.LoadInt64(&count))
 }
