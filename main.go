@@ -25,7 +25,7 @@ var (
 	size          = flag.Int("size", 10485760, "object size")
 	benchDuration = flag.Int("duration", 60, "duration in second")
 	storage       = flag.String("storage", "foo", "storage type [s3, redis]")
-	redisAddr     = flag.String("redis endpoint", "foo", "redis endpoint")
+	redisAddr     = flag.String("endpoint", "foo", "redis endpoint")
 
 	count int64
 )
@@ -73,7 +73,6 @@ func main() {
 
 	var wg sync.WaitGroup
 	var c Client
-
 	benchDura := time.Duration(*benchDuration) * time.Second
 	f, err := os.OpenFile(*fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {

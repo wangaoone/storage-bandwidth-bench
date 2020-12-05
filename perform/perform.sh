@@ -1,10 +1,11 @@
 #!/bin/bash
-thread=(1)
-duration=30
+thread=(1 5 10)
+duration=20
+type=$1
 
 for i in "${thread[@]}"; do
-  FILENAME=$i-log
+  FILENAME=thread$i-$type-log
   echo "Current thread is $i"
-  pssh -i -h instance.log ./storage-throughput-bench -duration $duration -thread "$i" -o "$FILENAME"
+  pssh -i -h instance.log ./storage-throughput-bench -storage $type -endpoint bandwidth-test.lqm2mp.0001.use1.cache.amazonaws.com:6379 -duration $duration -thread "$i" -o "$FILENAME"
   echo "Round $i finished"
 done
