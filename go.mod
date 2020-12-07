@@ -1,4 +1,4 @@
-module storage-throughput-bench
+module github.com/wangaoone/storage-bandwidth-bench
 
 go 1.14
 

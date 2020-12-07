@@ -11,12 +11,12 @@ rootlist=(
   ubuntu@ec2-54-88-197-63.compute-1.amazonaws.com
 )
 
-GOOS=linux go build
-SSHKEY=
+GO111MODULE=off GOOS=linux go build
+SSHKEY=~/.ssh/tianium
 
 for i in "${rootlist[@]}"; do
   echo "$i"
-  scp -i $SSHKEY ${GOPATH}/src/storage-throughput-bench/storage-throughput-bench "$i":~/.
+  scp -i $SSHKEY ${GOPATH}/src/github.com/wangaoone/storage-bandwidth-bench/storage-bandwidth-bench "$i":~/.
   echo "Upload finished"
 done
 

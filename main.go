@@ -3,14 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/google/uuid"
 	"log"
 	"math/rand"
 	"os"
-	"storage-throughput-bench/client"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/wangaoone/storage-bandwidth-bench/client"
+
+	"github.com/google/uuid"
 )
 
 type Client interface {
