@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -50,4 +51,7 @@ func (c *S3) Set(key string, val []byte) error {
 	//fmt.Println("set output is", setOutput.UploadID)
 
 	return err
+}
+
+func (c *S3) Close() {
 }

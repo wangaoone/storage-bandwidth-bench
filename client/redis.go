@@ -27,3 +27,7 @@ func (c *Redis) Get(key string) ([]byte, error) {
 func (c *Redis) Set(key string, val []byte) error {
 	return c.client.Set(key, val, 0).Err()
 }
+
+func (c *Redis) Close() {
+	c.client.Close()
+}

@@ -12,10 +12,11 @@ rootlist=(
 )
 
 GOOS=linux go build
+SSHKEY=
 
 for i in "${rootlist[@]}"; do
   echo "$i"
-  scp /Users/ao/go/src/storage-throughput-bench/storage-throughput-bench "$i":~/.
+  scp -i $SSHKEY ${GOPATH}/src/storage-throughput-bench/storage-throughput-bench "$i":~/.
   echo "Upload finished"
 done
 

@@ -16,6 +16,7 @@ import (
 type Client interface {
 	Get(string) ([]byte, error)
 	Set(string, []byte) error
+	Close()
 }
 
 var (
@@ -27,7 +28,19 @@ var (
 	storage       = flag.String("storage", "foo", "storage type [s3, redis]")
 	redisAddr     = flag.String("endpoint", "foo", "redis endpoint")
 
-	count int64
+	count    int64
+	addrList = []string{
+		"18.234.213.195:2378",
+		"18.207.176.171:2378",
+		"52.5.123.60:2378",
+		"35.175.230.27:2378",
+		"54.210.121.80:2378",
+		"54.198.5.78:2378",
+		"54.81.195.147:2378",
+		"34.226.220.6:2378",
+		"23.20.210.76:2378",
+		"54.88.197.63:2378",
+	}
 )
 
 func perform(duration time.Duration, threadIdx int, client Client, val []byte, wg *sync.WaitGroup) {
@@ -86,6 +99,8 @@ func main() {
 		c = client.NewS3Client(*bucketName)
 	} else if *storage == "redis" {
 		c = client.NewRedisClient(*redisAddr)
+	} else if *storage == "infinistore" {
+		c = client.NewInfiniStoreClient(addrList, *thread)
 	}
 
 	// generate load
