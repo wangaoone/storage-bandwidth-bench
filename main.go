@@ -85,7 +85,6 @@ func main() {
 	flag.Parse()
 
 	var wg sync.WaitGroup
-	var c Client
 	benchDura := time.Duration(*benchDuration) * time.Second
 	f, err := os.OpenFile(*fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
@@ -95,12 +94,19 @@ func main() {
 	log.SetOutput(f)
 	defer f.Close()
 
+	c := make([]Client, *thread)
 	if *storage == "s3" {
-		c = client.NewS3Client(*bucketName)
+		for i := 0; i < *thread; i++ {
+			c[i] = client.NewS3Client(*bucketName)
+		}
 	} else if *storage == "redis" {
-		c = client.NewRedisClient(*redisAddr)
+		for i := 0; i < *thread; i++ {
+			c[i] = client.NewRedisClient(*redisAddr)
+		}
 	} else if *storage == "infinistore" {
-		c = client.NewInfiniStoreClient(addrList, *thread)
+		for i := 0; i < *thread; i++ {
+			c[i] = client.NewInfiniStoreClient(addrList, *thread)
+		}
 	}
 
 	// generate load
@@ -111,7 +117,7 @@ func main() {
 	start := time.Now()
 	for i := 0; i < *thread; i++ {
 		wg.Add(1)
-		go perform(benchDura, i, c, val, &wg)
+		go perform(benchDura, i, c[i], val, &wg)
 	}
 	wg.Wait()
 	duration := time.Since(start)
