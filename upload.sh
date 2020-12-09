@@ -12,7 +12,7 @@ rootlist=(
 )
 
 GO111MODULE=off GOOS=linux go build
-SSHKEY=~/.ssh/tianium
+SSHKEY=
 
 for i in "${rootlist[@]}"; do
   echo "$i"
