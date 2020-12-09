@@ -1,11 +1,20 @@
 #!/bin/bash
 
-echo "Downloading S3 log"
-pssh -i -h instance.log cat thred1-log >log/s3-thread1.log
-pssh -i -h instance.log cat thred5-log >log/s3-thread5.log
-pssh -i -h instance.log cat thred10-log >log/s3-thread10.log
+BASE=`pwd`/`dirname $0`
+BASE=$BASE/../
 
-echo "Downloading Redis log"
-pssh -i -h instance.log cat thread1-redis-log >log/redis-thread1.log
-pssh -i -h instance.log cat thread5-redis-log >log/redis-thread5.log
-pssh -i -h instance.log cat thread10-redis-log >log/redis-thread10.log
+SSHKEY="-x \"-i ~/.ssh/ops.pem\""
+
+EXECUTOR="parallel-ssh -i -h $BASE/perform/instance.log $SSHKEY"
+
+if [ "$1" == "s3" ] ; then
+  echo "Downloading S3 log"
+  /bin/bash -c "$EXECUTOR cat thred1-log >log/s3-thread1.log"
+  /bin/bash -c "$EXECUTOR cat thred5-log >log/s3-thread5.log"
+  /bin/bash -c "$EXECUTOR cat thred10-log >log/s3-thread10.log"
+else
+  echo "Downloading $1 log"
+  /bin/bash -c "$EXECUTOR cat thread1-$1-log >log/$1-thread1.log"
+  /bin/bash -c "$EXECUTOR cat thread5-$1-log >log/$1-thread5.log"
+  /bin/bash -c "$EXECUTOR cat thread10-$1-log >log/$1-thread10.log"
+fi
