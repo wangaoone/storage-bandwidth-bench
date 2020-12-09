@@ -8,7 +8,7 @@ duration=20
 type=$1
 SSHKEY="-x \"-i ~/.ssh/ops.pem\""
 
-EXECUTOR="parallel-ssh -i -h $BASE/perform/instance.log $SSHKEY ."
+EXECUTOR="parallel-ssh -h $BASE/perform/instance.log $SSHKEY ."
 
 if [ "$2" == "local" ] ; then
   EXECUTOR="$BASE"
