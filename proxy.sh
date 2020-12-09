@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source ./env.sh
-echo $LAMBDAPREFIX
+echo $LAMBDAPREFIX" "$PUBLICIP
 
 cd /home/ubuntu/go/src/github.com/mason-leap-lab/infinicache/evaluation
 

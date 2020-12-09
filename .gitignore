@@ -1,3 +1,4 @@
 log
 storage-bandwidth-bench
 env.sh
+*.gz
