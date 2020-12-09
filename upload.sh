@@ -1,14 +1,14 @@
 rootlist=(
-  ubuntu@172.31.44.101
-  ubuntu@172.31.45.177
-  ubuntu@172.31.40.248
-  ubuntu@172.31.47.55
-  ubuntu@172.31.46.32
-  ubuntu@172.31.42.159
-  ubuntu@172.31.34.105
-  ubuntu@172.31.34.216
-  ubuntu@172.31.44.140
-  ubuntu@172.31.33.123
+  ubuntu@172.31.37.190
+  ubuntu@172.31.37.31
+  ubuntu@172.31.32.250
+  ubuntu@172.31.40.76
+  ubuntu@172.31.34.233
+  ubuntu@172.31.41.25
+  ubuntu@172.31.36.70
+  ubuntu@172.31.41.231
+  ubuntu@172.31.37.224
+  ubuntu@172.31.47.228
 )
 
 GO111MODULE=off GOOS=linux go build
