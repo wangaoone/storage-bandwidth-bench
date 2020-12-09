@@ -20,7 +20,9 @@ for i in "${rootlist[@]}"; do
   scp -i $SSHKEY ${GOPATH}/src/github.com/wangaoone/storage-bandwidth-bench/storage-bandwidth-bench "$i":~/.
   scp -i $SSHKEY ${GOPATH}/src/github.com/wangaoone/storage-bandwidth-bench/init.sh "$i":~/.
   scp -i $SSHKEY ${GOPATH}/src/github.com/wangaoone/storage-bandwidth-bench/proxy.sh "$i":~/.
+  scp -i $SSHKEY ${GOPATH}/src/github.com/wangaoone/storage-bandwidth-bench/update.sh "$i":~/.
   ssh -i $SSHKEY $i ./init.sh $SEQ
+  ssh -i $SSHKEY $i ./update.sh
   echo "Upload finished"
   ((SEQ=SEQ+1))
 done
