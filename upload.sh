@@ -14,10 +14,15 @@ rootlist=(
 GO111MODULE=off GOOS=linux go build
 SSHKEY=~/.ssh/ops.pem
 
+SEQ=0
 for i in "${rootlist[@]}"; do
   echo "$i"
   scp -i $SSHKEY ${GOPATH}/src/github.com/wangaoone/storage-bandwidth-bench/storage-bandwidth-bench "$i":~/.
+  scp -i $SSHKEY ${GOPATH}/src/github.com/wangaoone/storage-bandwidth-bench/init.sh "$i":~/.
+  scp -i $SSHKEY ${GOPATH}/src/github.com/wangaoone/storage-bandwidth-bench/proxy.sh "$i":~/.
+  ssh -i $SSHKEY $i ./init.sh $SEQ
   echo "Upload finished"
+  ((SEQ=SEQ+1))
 done
 
 go clean
