@@ -6,9 +6,9 @@ BASE=$BASE/../
 thread=(1 5 10)
 duration=20
 type=$1
-SSHKEY=
+SSHKEY="-x \"-i ~/.ssh/ops.pem\""
 
-EXECUTOR="pssh -i $SSHKEY -h instance.log ."
+EXECUTOR="pssh -i -h instance.log $SSHKEY ."
 
 if [ "$2" == "local" ] ; then
   EXECUTOR="$BASE"
