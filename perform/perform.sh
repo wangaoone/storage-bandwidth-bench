@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BASE=`pwd`/`dirname $0`
-BASE=BASE/../
+BASE=$BASE/../
 
 thread=(1 5 10)
 duration=20
@@ -10,7 +10,7 @@ SSHKEY=
 
 EXECUTOR="pssh -i $SSHKEY -h instance.log ."
 
-if [ "$2" == "local"] ; then
+if [ "$2" == "local" ] ; then
   EXECUTOR="$BASE"
 fi
 
