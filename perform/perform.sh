@@ -3,7 +3,7 @@
 BASE=`pwd`/`dirname $0`
 BASE=$BASE/../
 
-thread=(1 5 10)
+thread=(1 5 10 20 30)
 duration=20
 type=$1
 SSHKEY="-x \"-i ~/.ssh/ops.pem\""
