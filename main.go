@@ -25,8 +25,9 @@ var (
 	thread        = flag.Int("thread", 1, "number of concurrent thread")
 	size          = flag.Int("size", 10485760, "object size")
 	benchDuration = flag.Int("duration", 60, "duration in second")
-	storage       = flag.String("storage", "foo", "storage type [s3, redis]")
+	storage       = flag.String("storage", "foo", "storage type [s3, redis, infinistore, fsx]")
 	redisAddr     = flag.String("endpoint", "foo", "redis endpoint")
+	basePath      = flag.String("path", "/fsx", "base path")
 
 	count    int64
 	addrList = []string{
@@ -103,9 +104,9 @@ func main() {
 		for i := 0; i < *thread; i++ {
 			c[i] = client.NewRedisClient(*redisAddr)
 		}
-	} else if *storage == "infinistore" {
+	} else if *storage == "fsx" {
 		for i := 0; i < *thread; i++ {
-			c[i] = client.NewInfiniStoreClient(addrList, *thread)
+			c[i] = client.NewFsxClient(*basePath)
 		}
 	}
 
